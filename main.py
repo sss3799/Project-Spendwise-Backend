@@ -55,4 +55,4 @@ async def process_statements(pdf_paths: List[str]):
 
 if __name__ == "__main__":
     # To run this: uvicorn main:app --reload
-    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))

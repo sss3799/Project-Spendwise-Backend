@@ -1,10 +1,10 @@
-# Flask API Service Starter
+# FastAPI API Service
 
-This is a minimal Flask API service starter based on [Google Cloud Run Quickstart](https://cloud.google.com/run/docs/quickstarts/build-and-deploy/deploy-python-service).
+This is a FastAPI application for processing bank statements from PDF files.
 
 ## Getting Started
 
-Server should run automatically when starting a workspace. To run manually, run:
+To run the development server, execute the following command in your terminal:
 ```sh
 ./devserver.sh
 ```
