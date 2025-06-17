@@ -7,3 +7,6 @@ fastapi
 uvicorn
 pandas
 tabula-py
+python-multipart
+matplotlib
+Jinja2
