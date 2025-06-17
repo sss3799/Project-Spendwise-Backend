@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
+        header { background-color: #007bff; color: white; padding: 10px 0; text-align: center; margin-bottom: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2, h3 { color: #0056b3; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f0f0f0; }
+        .section { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+        .section:last-child { border-bottom: none; }
+        .chart-container { text-align: center; margin-bottom: 20px; }
+        .chart-container img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; }
+        .error { color: red; font-weight: bold; }
+        .empty-data { color: #777; font-style: italic; }
+        .summary-item { margin-bottom: 5px; }
+        .summary-item strong { color: #333; }
+        a.back-link { display: inline-block; margin-bottom:20px; color: #007bff; text-decoration: none; padding: 8px 15px; border: 1px solid #007bff; border-radius:4px; }
+        a.back-link:hover { background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Analysis Results</h1>
+    </header>
+    <div class="container">
+        <a href="/" class="back-link">&laquo; Upload More Files</a>
+
+        <h2>{{ status_message | default('Processing Status Not Available') }}</h2>
+
+        {% if error_message %}
+            <p class="error">{{ error_message }}</p>
+        {% endif %}
+
+        <div class="section">
+            <h3>Extraction Information</h3>
+            {% if extraction_info %}
+                <p><strong>Files Processed:</strong> {{ extraction_info.files_processed_names | join(', ') if extraction_info.files_processed_names else 'N/A' }}</p>
+                <p><strong>Initial Rows Extracted:</strong> {{ extraction_info.initial_rows_extracted if extraction_info.initial_rows_extracted is not none else 'N/A' }}</p>
+                <p><strong>Initial Columns Extracted:</strong> {{ extraction_info.initial_columns_extracted | join(', ') if extraction_info.initial_columns_extracted else 'N/A' }}</p>
+                {% if extraction_info.notes %}
+                    <p><strong>Notes:</strong> {{ extraction_info.notes }}</p>
+                {% endif %}
+            {% else %}
+                <p class="empty-data">No extraction information available.</p>
+            {% endif %}
+        </div>
+
+        {% if insights %}
+            <div class="section">
+                <h3>Summary Statistics</h3>
+                {% if insights.summary_statistics %}
+                    {% for key, value in insights.summary_statistics.items() %}
+                        {% if key == 'spending_by_category' %}
+                            <div class="summary-item">
+                                <strong>Spending by Category:</strong>
+                                {% if value %}
+                                    <ul>
+                                    {% for cat, val in value.items() %}
+                                        <li>{{ cat }}: {{ "%.2f"|format(val) }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <span class="empty-data">No spending data by category.</span>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <p class="summary-item"><strong>{{ key | replace('_', ' ') | title }}:</strong>
+                                {% if value is number %}
+                                    {{ "%.2f"|format(value) }}
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+                            </p>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p class="empty-data">No summary statistics available.</p>
+                {% endif %}
+            </div>
+
+            {% if charts_data %}
+            <div class="section">
+                <h3>Charts</h3>
+                <div class="chart-container">
+                    <h4>Spending by Category</h4>
+                    {% if charts_data.spending_by_category_png_base64 %}
+                        <img src="data:image/png;base64,{{ charts_data.spending_by_category_png_base64 }}" alt="Spending by Category Chart">
+                    {% else %}
+                        <p class="empty-data">Spending by category chart could not be generated or is not available.</p>
+                    {% endif %}
+                </div>
+                <div class="chart-container">
+                    <h4>Income vs. Expense Trend</h4>
+                    {% if charts_data.income_expense_trend_png_base64 %}
+                        <img src="data:image/png;base64,{{ charts_data.income_expense_trend_png_base64 }}" alt="Income vs. Expense Trend Chart">
+                    {% else %}
+                        <p class="empty-data">Income vs. expense trend chart could not be generated or is not available.</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="section">
+                <h3>Cleaned Transaction Data (Sample)</h3>
+                {% if insights.cleaned_transactions_list %}
+                    {% set transactions = insights.cleaned_transactions_list %}
+                    {% if transactions %}
+                        <table>
+                            <thead>
+                                <tr>
+                                    {% for key in transactions[0].keys() %}
+                                        <th>{{ key }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in transactions[:20] %} {# Display first 20 rows as sample #}
+                                    <tr>
+                                        {% for value in row.values() %}
+                                            <td>{{ value }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% if transactions | length > 20 %}
+                            <p><i>Showing first 20 transactions. Full data processed.</i></p>
+                        {% endif %}
+                    {% else %}
+                        <p class="empty-data">No cleaned transaction data available in the list.</p>
+                    {% endif %}
+                {% else %}
+                    <p class="empty-data">Cleaned transaction data list not found in insights or is empty.</p>
+                {% endif %}
+            </div>
+
+        {% elif not error_message and extraction_info and extraction_info.notes %}
+             <!-- Handled by extraction_info.notes already if insights is None -->
+        {% elif not error_message %}
+            <p class="empty-data">No insights generated. This might be due to no data being extracted from the PDFs or an issue during processing.</p>
+        {% endif %}
+
+        <a href="/" class="back-link" style="margin-top:20px;">&laquo; Analyze More Statements</a>
+    </div>
+</body>
+</html>

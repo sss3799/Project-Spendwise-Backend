@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Financial Analyzer</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
+        header { background-color: #007bff; color: white; padding: 10px 0; text-align: center; margin-bottom: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { color: #007bff; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input[type="file"] { border: 1px solid #ddd; padding: 10px; border-radius: 4px; width: calc(100% - 22px); margin-bottom: 20px; }
+        input[type="submit"] { background-color: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        input[type="submit"]:hover { background-color: #218838; }
+        .results-section { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
+        .hidden { display: none; }
+        #loading { text-align: center; font-size: 18px; color: #007bff; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Financial Statement Analyzer</h1>
+    </header>
+    <div class="container">
+        <h2>Upload PDF Statements</h2>
+        <form id="uploadForm" action="/process_statements/" method="post" enctype="multipart/form-data">
+            <div>
+                <label for="files">Choose PDF files:</label>
+                <input type="file" id="files" name="files" multiple accept=".pdf" required>
+            </div>
+            <input type="submit" value="Analyze Statements">
+        </form>
+        <div id="loading" class="hidden">
+            <p>Processing your statements, please wait...</p>
+        </div>
+        <div id="resultsDisplay" class="results-section hidden">
+            <!-- Results will be loaded here by results.html content -->
+        </div>
+    </div>
+
+    <script>
+        // Optional: Show loading indicator on form submit
+        const form = document.getElementById('uploadForm');
+        if (form) {
+            form.addEventListener('submit', function() {
+                document.getElementById('loading').classList.remove('hidden');
+                document.getElementById('resultsDisplay').classList.add('hidden');
+            });
+        }
+    </script>
+</body>
+</html>
